@@ -45,21 +45,25 @@ func inputNumbers() []float64 {
 	var numbers []float64
 	var rawNumbers string
 
-	fmt.Print("Введите числа через запятую: ")
-	_, err := fmt.Scan(&rawNumbers)
-	if err != nil {
-		return nil
+	for {
+		fmt.Print("Введите числа через запятую: ")
+		_, err := fmt.Scan(&rawNumbers)
+		if err != nil {
+			continue
+		}
+
+		tempSlice := strings.Split(rawNumbers, ",")
+		for _, number := range tempSlice {
+			floatNumber, err_ := strconv.ParseFloat(number, 64)
+			if err_ != nil {
+				fmt.Println("Ошибка при конвертации строки в float64. Повторите ввод. Err:" + err_.Error())
+				continue
+			}
+			numbers = append(numbers, floatNumber)
+		}
+		return numbers
 	}
 
-	tempSlice := strings.Split(rawNumbers, ",")
-	for _, number := range tempSlice {
-		floatNumber, err_ := strconv.ParseFloat(number, 64)
-		if err_ != nil {
-			return nil
-		}
-		numbers = append(numbers, floatNumber)
-	}
-	return numbers
 }
 
 func Calculate(operation string, numbers []float64) float64 {

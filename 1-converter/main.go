@@ -12,13 +12,13 @@ const (
 )
 
 func main() {
-	helloMessage()
+	printHelloMessage()
 	firstCurrency, secondCurrency, amount := UserInput()
 	result := CurrencyConverter(firstCurrency, secondCurrency, amount)
 	fmt.Printf("Результат конвертации %s в %s: %.2f", firstCurrency, secondCurrency, result)
 }
 
-func helloMessage() {
+func printHelloMessage() {
 	fmt.Println("\tКонвертер валют")
 	fmt.Println("=====================")
 	fmt.Println("Доступные валюты для конвертации: USD, EUR, RUB")
@@ -42,7 +42,7 @@ func inputFloatValue(msg string) float64 {
 		_, err := fmt.Scan(&result)
 		if err != nil {
 			fmt.Println("Ошибка при получении ввода:" + err.Error())
-			return 0.00
+			continue
 		}
 		if result <= 0 {
 			fmt.Println("[ОШИБКА] Сумма для конвертации должна быть > 0")
@@ -58,7 +58,7 @@ func inputStringValue(msg, secondCurr string) string {
 		_, err := fmt.Scan(&value)
 		if err != nil {
 			fmt.Println("Ошибка при получении ввода:" + err.Error())
-			return ""
+			continue
 		}
 		value = strings.ToLower(value)
 

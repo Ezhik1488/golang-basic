@@ -5,11 +5,7 @@ import (
 	"strings"
 )
 
-const (
-	USDToEUR = 0.92
-	USDToRUB = 86.19
-	EURToRUB = 93.78
-)
+type RatioMap map[string]float64
 
 func main() {
 	printHelloMessage()
@@ -81,20 +77,21 @@ func inputStringValue(msg, secondCurr string) string {
 }
 
 func CurrencyConverter(source, target string, amount float64) float64 {
-	switch {
-	case source == "usd" && target == "eur":
-		return amount * USDToEUR
-	case source == "usd" && target == "rub":
-		return amount * USDToRUB
-	case source == "eur" && target == "rub":
-		return amount * EURToRUB
-	case source == "eur" && target == "usd":
-		return amount / USDToEUR
-	case source == "rub" && target == "usd":
-		return amount / USDToRUB
-	case source == "rub" && target == "eur":
-		return amount / EURToRUB
-	default:
-		return 0.00
+	ratios := RatioMap{
+		"usd_rub":    86.19,
+		"usd_eur":    0.92,
+		"eur_to_rub": 93.78,
 	}
+
+	directKey := source + "_" + target
+	if ratio, exists := ratios[directKey]; exists {
+		return ratio * amount
+	}
+
+	reverseKey := target + "_" + source
+	if ratio, exists := ratios[reverseKey]; exists {
+		return amount / ratio
+	}
+
+	return 0.00
 }

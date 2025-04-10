@@ -10,7 +10,7 @@ type RatioMap map[string]float64
 func main() {
 	printHelloMessage()
 	firstCurrency, secondCurrency, amount := UserInput()
-	result := CurrencyConverter(firstCurrency, secondCurrency, amount)
+	result := CurrencyConverter(firstCurrency, secondCurrency, amount, getRationMap())
 	fmt.Printf("Результат конвертации %s в %s: %.2f", firstCurrency, secondCurrency, result)
 }
 
@@ -19,6 +19,15 @@ func printHelloMessage() {
 	fmt.Println("=====================")
 	fmt.Println("Доступные валюты для конвертации: USD, EUR, RUB")
 	fmt.Print("=====================\n\n")
+}
+
+func getRationMap() *RatioMap {
+	ratios := RatioMap{
+		"usd_rub":    86.19,
+		"usd_eur":    0.92,
+		"eur_to_rub": 93.78,
+	}
+	return &ratios
 }
 
 func UserInput() (string, string, float64) {
@@ -76,20 +85,14 @@ func inputStringValue(msg, secondCurr string) string {
 	}
 }
 
-func CurrencyConverter(source, target string, amount float64) float64 {
-	ratios := RatioMap{
-		"usd_rub":    86.19,
-		"usd_eur":    0.92,
-		"eur_to_rub": 93.78,
-	}
-
+func CurrencyConverter(source, target string, amount float64, ratios *RatioMap) float64 {
 	directKey := source + "_" + target
-	if ratio, exists := ratios[directKey]; exists {
+	if ratio, exists := (*ratios)[directKey]; exists {
 		return ratio * amount
 	}
 
 	reverseKey := target + "_" + source
-	if ratio, exists := ratios[reverseKey]; exists {
+	if ratio, exists := (*ratios)[reverseKey]; exists {
 		return amount / ratio
 	}
 

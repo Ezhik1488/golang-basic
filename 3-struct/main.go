@@ -37,6 +37,7 @@ func getFilePath() string {
 	var filePath string
 	_, err := fmt.Scan(&filePath)
 	if err != nil {
+		color.Red(err.Error())
 		return ""
 	}
 	return filePath

@@ -2,6 +2,7 @@ package file
 
 import (
 	"errors"
+	"github.com/fatih/color"
 	"os"
 	"path"
 )
@@ -27,6 +28,7 @@ func WriteFile(filePath string, data []byte) error {
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
+			color.Red("Error closing file: " + err.Error())
 		}
 	}(file)
 

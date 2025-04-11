@@ -31,6 +31,9 @@ func (storage *Storage) ReadBinList() (*bins.BinList, error) {
 
 func (storage *Storage) SaveBinList(bins *bins.BinList) error {
 	data, err := bins.ToBytes()
+	if err != nil {
+		return err
+	}
 	err = file.WriteFile(storage.FilePath, data)
 	if err != nil {
 		return err

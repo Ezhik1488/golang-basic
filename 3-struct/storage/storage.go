@@ -2,23 +2,26 @@ package storage
 
 import (
 	"3-struct/bins"
-	"3-struct/file"
 	"encoding/json"
-	"github.com/fatih/color"
 )
 
-type Storage struct {
-	FilePath string
+type DB interface {
+	ReadFile() ([]byte, error)
+	WriteFile(data []byte) error
 }
 
-func NewStorage(filePath string) *Storage {
-	return &Storage{FilePath: filePath}
+type Storage struct {
+	db DB
+}
+
+func NewStorage(fileStorage DB) *Storage {
+	return &Storage{fileStorage}
 }
 
 func (storage *Storage) ReadBinList() (*bins.BinList, error) {
 	var binList bins.BinList
 
-	jsonFile, err := file.ReadFileWithExt(storage.FilePath, ".json")
+	jsonFile, err := storage.db.ReadFile()
 	if err != nil {
 		return nil, err
 	}
@@ -34,10 +37,10 @@ func (storage *Storage) SaveBinList(bins *bins.BinList) error {
 	if err != nil {
 		return err
 	}
-	err = file.WriteFile(storage.FilePath, data)
+	err = storage.db.WriteFile(data)
 	if err != nil {
 		return err
 	}
-	color.Green("Saved bins list to file: %s", storage.FilePath)
+
 	return nil
 }

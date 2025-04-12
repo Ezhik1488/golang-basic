@@ -2,6 +2,7 @@ package main
 
 import (
 	"3-struct/bins"
+	"3-struct/file"
 	"3-struct/storage"
 	"fmt"
 	"github.com/fatih/color"
@@ -11,8 +12,9 @@ func main() {
 	// Получение пути, где хранится файл storage_bin
 	filePath := getFilePath()
 
-	// Инициализация Storage
-	storageBin := storage.NewStorage(filePath)
+	// Инициализация ImplStorage
+	localDB := file.NewLocalStorage(filePath, ".json")
+	storageBin := storage.NewStorage(localDB)
 
 	binList := TestData()
 

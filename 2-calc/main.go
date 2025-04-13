@@ -17,6 +17,18 @@ func main() {
 
 }
 
+var allowOperations = map[string]bool{
+	"avg": true,
+	"sum": true,
+	"med": true,
+}
+
+var operationMap = map[string]func([]float64) float64{
+	"avg": Average,
+	"sum": Sum,
+	"med": Median,
+}
+
 func choiceOperation() string {
 	var operation string
 	for {
@@ -25,20 +37,12 @@ func choiceOperation() string {
 		if err != nil {
 			continue
 		}
-		operation = strings.ToLower(operation)
-
-		switch operation {
-		case "avg":
+		if allowOperations[strings.ToLower(operation)] {
 			return operation
-		case "sum":
-			return operation
-		case "med":
-			return operation
-		default:
+		} else {
 			fmt.Println("Неизвестный тип операции")
 		}
 	}
-
 }
 
 func inputNumbers() []float64 {
@@ -67,16 +71,11 @@ func inputNumbers() []float64 {
 }
 
 func Calculate(operation string, numbers []float64) float64 {
-	switch operation {
-	case "avg":
-		return Average(numbers)
-	case "sum":
-		return Sum(numbers)
-	case "med":
-		return Median(numbers)
-	default:
+	calculator, ok := operationMap[operation]
+	if !ok {
 		return 0.00
 	}
+	return calculator(numbers)
 }
 
 func Average(numbers []float64) float64 {

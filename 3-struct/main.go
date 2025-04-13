@@ -2,13 +2,26 @@ package main
 
 import (
 	"3-struct/bins"
+	config2 "3-struct/config"
 	"3-struct/file"
 	"3-struct/storage"
 	"fmt"
 	"github.com/fatih/color"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// Получение переменных окружения
+	err := godotenv.Load()
+	if err != nil {
+		color.Red("Error loading .env file")
+	}
+	color.Green("Данные из .env успешно загружены!")
+
+	// Инициализация конфига
+	config := config2.NewConfig()
+	color.Magenta(config.ApiKey)
+
 	// Получение пути, где хранится файл storage_bin
 	filePath := getFilePath()
 
@@ -19,7 +32,7 @@ func main() {
 	binList := TestData()
 
 	// Сохранения Bins в файл
-	err := storageBin.SaveBinList(binList)
+	err = storageBin.SaveBinList(binList)
 	if err != nil {
 		color.Red(err.Error())
 		return

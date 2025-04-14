@@ -13,10 +13,14 @@ import (
 
 func main() {
 	// Инициализация необходимых компонентов
-	api, storageBin := initApp()
+	binOperation := initApp()
 
-	// Инициализации операций над Bins
-	binOperation := operations.NewOperationsBins(api, storageBin)
+	err := binOperation.CreateBin()
+	if err != nil {
+		color.Red(err.Error())
+	} else {
+		color.Green("BinOperation Created Successfully")
+	}
 
 	// TODO: Реализация взаимодействия с API JsonBin
 	//  1. Получение необходимых флагов, переданных пользователем
@@ -36,7 +40,7 @@ func main() {
 	//fmt.Println(binListJson)
 }
 
-func initApp() (*api2.JsonBinAPI, *storage.Storage) {
+func initApp() *operations.OperationsBins {
 	// Получение переменных окружения
 	err := godotenv.Load()
 	if err != nil {
@@ -48,19 +52,20 @@ func initApp() (*api2.JsonBinAPI, *storage.Storage) {
 	config := config2.NewConfig()
 	color.Magenta(config.ApiKey)
 
-	// Получение пути, где хранится файл storage_bin
-	filePath := getFilePath()
-
 	// Инициализация ImplStorage
-	localDB := file.NewLocalStorage(filePath, ".json")
+	localDB := file.NewLocalStorage(config.LocalStoragePath, ".json")
 	storageBin := storage.NewStorage(localDB)
 
 	// Инициализация JsonBinAPI
 	api := api2.NewJsonBinAPI(config)
 
-	return api, storageBin
+	// Инициализации операций над Bins
+	binOperation := operations.NewOperationsBins(api, storageBin)
+
+	return binOperation
 }
 
+// getFilePath - deprecated
 func getFilePath() string {
 	fmt.Print("Укажите путь до файла в котором хранятся данные о Bins: ")
 	var filePath string

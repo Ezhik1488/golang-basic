@@ -23,7 +23,7 @@ func NewOperationsBins(api *api2.JsonBinAPI, storage *storage.Storage) *Operatio
 	localFile := file.NewLocalStorage(flags.File, ".json")
 	binList, err := storage.ReadBinList()
 	if err != nil {
-		panic(err)
+		binList = &bins.BinList{}
 	}
 
 	return &OperationsBins{
@@ -84,12 +84,12 @@ func (op *OperationsBins) GetBin() string {
 func (op *OperationsBins) PrintBinsList() string { return "" }
 
 func getFlags() *Flags {
-	createBin := flag.Bool("create", false, "Добавить Bin")
+	createBin := flag.Bool("create", true, "Добавить Bin")
 	updateBin := flag.Bool("update", false, "Обновить Bin")
 	deleteBin := flag.Bool("delete", false, "Удалить Bin")
 	getBin := flag.Bool("get", false, "Получить Bin ")
 	listBins := flag.Bool("list", false, "Получить список ID и Name из локального файла")
-	dataFile := flag.String("file", "", "Путь файла для загрузки/обновления")
+	dataFile := flag.String("file", "data.json", "Путь файла для загрузки/обновления")
 	binID := flag.String("id", "", "BinID для получения/обновления/удаления")
 	binName := flag.String("name", time.Now().String(), "Имя Bin в локальном файле")
 

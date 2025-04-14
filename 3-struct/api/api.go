@@ -26,9 +26,11 @@ type Headers struct {
 }
 
 type CreateResponse struct {
-	MetaData struct {
-		ID string `json:"id"`
-	} `json:"metadata"`
+	MetaData Metadata `json:"metadata"`
+}
+
+type Metadata struct {
+	ID string `json:"id"`
 }
 
 func NewJsonBinAPI(cfg *config.Config) *JsonBinAPI {
@@ -77,12 +79,19 @@ func (api *JsonBinAPI) Create(data []byte) (*CreateResponse, error) {
 	}
 
 	req.Header.Add("Content-Type", api.contentType)
+	req.Header.Add("X-Master-Key", api.xMasterKey)
 	req.Header.Add("X-Bin-Private", strconv.FormatBool(api.XBinPrivate))
 
-	resp, err := api.makeRequest(req, "POSt")
+	resp, err := api.makeRequest(req, "POST")
 	if err != nil {
 		return nil, err
 	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			color.Red("Ошибка при закрытии Response Body ")
+		}
+	}(resp.Body)
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -155,12 +164,6 @@ func (api *JsonBinAPI) makeRequest(request *http.Request, method string) (*http.
 		color.Red("При выполнении %s запроса, произошла ошибка %v", method, err.Error())
 		return nil, err
 	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			color.Red("Ошибка при закрытии Response Body ")
-		}
-	}(resp.Body)
 
 	return resp, nil
 }

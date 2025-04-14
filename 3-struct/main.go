@@ -1,6 +1,7 @@
 package main
 
 import (
+	api2 "3-struct/api"
 	"3-struct/bins"
 	config2 "3-struct/config"
 	"3-struct/file"
@@ -31,6 +32,20 @@ func main() {
 
 	binList := TestData()
 
+	// Инициализация JsonBinAPI
+	api := api2.NewJsonBinAPI(config)
+	result, err := api.Get("67fd00008a456b7966891650")
+	if err != nil {
+		fmt.Println("Ooops... some error")
+	}
+	fmt.Println(result)
+	// TODO: Реализация взаимодействия с API JsonBin
+	//  1. Получение необходимых флагов, переданных пользователем
+	// 	2. Чтение необходимого файла по пути, переданным во флаге --file
+	//  3. Выполнение соответствующей операции в зависимости от флага --create, --update, --delete
+	// 	   Можно реализовать мапу map[string]func() для хранения функций и map[string]bool для разрешенных операций
+	//  4. При create надо сохранять id и name в локальный файл
+
 	// Сохранения Bins в файл
 	err = storageBin.SaveBinList(binList)
 	if err != nil {
@@ -38,17 +53,17 @@ func main() {
 		return
 	}
 
-	// Чтение
-	binListJson, err := storageBin.ReadBinList()
-	if err != nil {
-		color.Red(err.Error())
-		return
-	}
-	fmt.Println(binListJson)
+	//// Чтение
+	//binListJson, err := storageBin.ReadBinList()
+	//if err != nil {
+	//	color.Red(err.Error())
+	//	return
+	//}
+	//fmt.Println(binListJson)
 }
 
 func getFilePath() string {
-	fmt.Print("Укажите путь до файла или его название, если он находится в корне проекта: ")
+	fmt.Print("Укажите путь до файла в котором хранятся данные о Bins: ")
 	var filePath string
 	_, err := fmt.Scan(&filePath)
 	if err != nil {

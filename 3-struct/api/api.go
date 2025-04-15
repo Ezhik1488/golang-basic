@@ -4,6 +4,7 @@ import (
 	"3-struct/config"
 	"bytes"
 	"encoding/json"
+	"errors"
 	"github.com/fatih/color"
 	"io"
 	"net/http"
@@ -153,7 +154,7 @@ func (api *JsonBinAPI) Delete(binID string) error {
 	}
 
 	if resp.StatusCode == 400 {
-		color.Red("Неверный BinID")
+		return errors.New("invalid BinID")
 	}
 	return nil
 }

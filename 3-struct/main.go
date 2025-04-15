@@ -11,33 +11,31 @@ import (
 	"github.com/joho/godotenv"
 )
 
+type Operation map[string]func() error
+
 func main() {
 	// Инициализация необходимых компонентов
 	binOperation := initApp()
 
-	err := binOperation.CreateBin()
-	if err != nil {
-		color.Red(err.Error())
-	} else {
-		color.Green("BinOperation Created Successfully")
+	allowOperation := Operation{
+		"create": binOperation.CreateBin,
+		"delete": binOperation.DeleteBin,
+		"update": binOperation.UpdateBin,
+		"get":    binOperation.GetBin,
+		"list":   binOperation.PrintBinsList,
 	}
 
-	// TODO: Реализация взаимодействия с API JsonBin
-	//  1. Получение необходимых флагов, переданных пользователем
-	// 	2. Чтение необходимого файла по пути, переданным во флаге --file
-	//  3. Выполнение соответствующей операции в зависимости от флага --create, --update, --delete
-	// 	   Можно реализовать мапу map[string]func() для хранения функций и map[string]bool для разрешенных операций
-	//  4. При create надо сохранять id и name в локальный файл
+	flagValue := binOperation.ConvertFlagToMap()
 
-	// Сохранения Bins в файл
-
-	//// Чтение
-	//binListJson, err := storageBin.ReadBinList()
-	//if err != nil {
-	//	color.Red(err.Error())
-	//	return
-	//}
-	//fmt.Println(binListJson)
+	for key, value := range flagValue {
+		if value {
+			action := allowOperation[key]
+			err := action()
+			if err != nil {
+				return
+			}
+		}
+	}
 }
 
 func initApp() *operations.OperationsBins {
@@ -50,7 +48,6 @@ func initApp() *operations.OperationsBins {
 
 	// Инициализация конфига
 	config := config2.NewConfig()
-	color.Magenta(config.ApiKey)
 
 	// Инициализация ImplStorage
 	localDB := file.NewLocalStorage(config.LocalStoragePath, ".json")

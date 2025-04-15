@@ -7,21 +7,30 @@ import (
 	"path"
 )
 
-func ReadFileWithExt(filePath string, ext string) ([]byte, error) {
+type LocalStorage struct {
+	Path          string
+	FileExtension string
+}
+
+func NewLocalStorage(path, fileExtension string) *LocalStorage {
+	return &LocalStorage{path, fileExtension}
+}
+
+func (storage *LocalStorage) ReadFile() ([]byte, error) {
 	// Проверить расширение файла
-	if path.Ext(filePath) != ext {
-		return nil, errors.New("file must have " + ext + " extension")
+	if path.Ext(storage.Path) != storage.FileExtension {
+		return nil, errors.New("file must have " + storage.FileExtension + " extension")
 	}
 
-	file, err := os.ReadFile(filePath)
+	file, err := os.ReadFile(storage.Path)
 	if err != nil {
 		return nil, err
 	}
 	return file, nil
 }
 
-func WriteFile(filePath string, data []byte) error {
-	file, err := os.Create(filePath)
+func (storage *LocalStorage) WriteFile(data []byte) error {
+	file, err := os.Create(storage.Path)
 	if err != nil {
 		return err
 	}
@@ -36,5 +45,6 @@ func WriteFile(filePath string, data []byte) error {
 	if err != nil {
 		return err
 	}
+	color.Green("Saved bins list to file: %s", storage.Path)
 	return nil
 }

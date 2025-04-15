@@ -6,6 +6,7 @@ import (
 	"3-struct/file"
 	"3-struct/storage"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"github.com/fatih/color"
@@ -48,28 +49,38 @@ type Flags struct {
 	BinName string
 }
 
+var (
+	ErrAddToJsonBin  = errors.New("ошибка при добавлении Bins в JSON BIN")
+	ErrCreateBin     = errors.New("ошибка создания нового Bin")
+	ErrSaveToStorage = errors.New("ошибка сохранения в хранилище")
+	ErrReadFile      = errors.New("ошибка при чтении файла")
+	ErrUpdate        = errors.New("ошибка при обновлении Bin")
+	ErrDelete        = errors.New("ошибка при удалении Bin с JSON BIN")
+	ErrGetBin        = errors.New("ошибка получения Bin с JSON BIN")
+)
+
 func (op *OperationsBins) CreateBin() error {
 	dataFile, err := op.localFile.ReadFile()
 	if err != nil {
-		panic(err)
+		return ErrReadFile
 	}
 	response, err := op.Api.Create(dataFile)
 	if err != nil {
 		color.Red(err.Error())
-		return err
+		return ErrAddToJsonBin
 	}
 	binID := response.MetaData.ID
 	newBin, err := bins.NewBin(binID, op.Flags.BinName, false)
 	if err != nil {
 		color.Red(err.Error())
-		return err
+		return ErrCreateBin
 	}
 
 	op.binList.Bins = append(op.binList.Bins, *newBin)
 	err = op.Storage.SaveBinList(op.binList)
 	if err != nil {
 		color.Red(err.Error())
-		return err
+		return ErrSaveToStorage
 	}
 	return nil
 }
@@ -78,12 +89,12 @@ func (op *OperationsBins) UpdateBin() error {
 	dataFile, err := op.localFile.ReadFile()
 	if err != nil {
 		color.Red("Ошибка при чтении файла %s", op.Flags.File)
-		panic(err)
+		return ErrReadFile
 	}
 	err = op.Api.Update(dataFile, op.Flags.BinID)
 	if err != nil {
 		color.Red(err.Error())
-		return err
+		return ErrUpdate
 	}
 	color.Green("Updated bin successfully: %s", op.Flags.BinID)
 	return nil
@@ -93,7 +104,7 @@ func (op *OperationsBins) DeleteBin() error {
 	err := op.Api.Delete(op.Flags.BinID)
 	if err != nil {
 		color.Red(err.Error())
-		return err
+		return ErrDelete
 	}
 	for i, bin := range op.binList.Bins {
 		if bin.ID == op.Flags.BinID {
@@ -103,7 +114,7 @@ func (op *OperationsBins) DeleteBin() error {
 	err = op.Storage.SaveBinList(op.binList)
 	if err != nil {
 		color.Red(err.Error())
-		return err
+		return ErrSaveToStorage
 	}
 
 	color.Green("Deleted bin successfully: %s", op.Flags.BinID)
@@ -114,7 +125,7 @@ func (op *OperationsBins) GetBin() error {
 	result, err := op.Api.Get(op.Flags.BinID)
 	if err != nil {
 		color.Red(err.Error())
-		return err
+		return ErrGetBin
 	}
 	jsonData, err := json.MarshalIndent(result, "", "\t")
 	if err != nil {

@@ -6,7 +6,6 @@ import (
 	"3-struct/file"
 	"3-struct/operations"
 	"3-struct/storage"
-	"fmt"
 	"github.com/fatih/color"
 	"github.com/joho/godotenv"
 )
@@ -60,16 +59,4 @@ func initApp() *operations.OperationsBins {
 	binOperation := operations.NewOperationsBins(api, storageBin)
 
 	return binOperation
-}
-
-// getFilePath - deprecated
-func getFilePath() string {
-	fmt.Print("Укажите путь до файла в котором хранятся данные о Bins: ")
-	var filePath string
-	_, err := fmt.Scan(&filePath)
-	if err != nil {
-		color.Red(err.Error())
-		return ""
-	}
-	return filePath
 }
